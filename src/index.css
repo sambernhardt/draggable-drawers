@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+body {
+  background: black;
+  color: var(--color-neutral-950);
+}
+
+#root {
+  background: var(--color-neutral-50);
+  transform-origin: top;
+}
