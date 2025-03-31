@@ -6,6 +6,7 @@ import AppV2 from "./v2/App.tsx";
 import AppV3 from "./v3/App.tsx";
 import AppV4 from "./v4/App.tsx";
 import AppV5 from "./v5/App.tsx";
+import AppV6 from "./v6/App.tsx";
 import { UISwitcher } from "./UISwitcher.tsx";
 
 createRoot(document.getElementById("root")!).render(
@@ -34,9 +35,11 @@ createRoot(document.getElementById("root")!).render(
         // - Background scale
         // - Drag handle
         // - Drag intention refinements
-        // - Elastic drag limits
+
+        v6: () => <AppV6 />,
+        // v6: Elastic drag limits
       }}
-      defaultVersion="v5"
+      defaultVersion="v6"
       props={{}}
     />
   </StrictMode>

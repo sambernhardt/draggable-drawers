@@ -7,32 +7,24 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-function map(x1: number, x2: number, y1: number, y2: number, value: number) {
+const map = (x1: number, x2: number, y1: number, y2: number, value: number) => {
   return ((value - x1) * (y2 - y1)) / (x2 - x1) + y1;
-}
+};
 
-function mapWithEasing(
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+const mapEased = (
   x1: number,
   x2: number,
   y1: number,
   y2: number,
-  value: number,
-  [p1x, p1y, p2x, p2y]: [number, number, number, number] = [
-    0.17, 0.67, 0.1, 0.99,
-  ]
-) {
-  // Normalize input value to 0-1 range
-  const t = (value - x1) / (x2 - x1);
-
-  // Calculate bezier curve value using cubic bezier formula
-  const bezierT = (t: number) => {
-    const invT = 1 - t;
-    return 3 * invT * invT * t * p1y + 3 * invT * t * t * p2y + t * t * t;
-  };
-
-  // Map bezier output back to target range
-  return y1 + bezierT(t) * (y2 - y1);
-}
+  value: number
+) => {
+  const clamped = Math.max(x1, Math.min(value, x2));
+  const t = (clamped - x1) / (x2 - x1);
+  const eased = easeOutCubic(1 - t);
+  return y1 + (y2 - y1) * eased;
+};
 
 const useViewportHeight = () => {
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -183,6 +175,7 @@ const DrawerHeader = ({ headingText }: { headingText: string }) => {
 const DURATION = 400;
 const FULL_HEIGHT_OFFSET = 20;
 const BACKGROUND_INSET = 8;
+const DAMPED_TRANSLATE_LIMIT = 10;
 
 const Drawer = ({
   isOpen,
@@ -236,9 +229,9 @@ const Drawer = ({
 
   const getFullOpenTranslateY = useCallback(() => {
     if (fullHeight === "100%") {
-      return FULL_HEIGHT_OFFSET;
+      return FULL_HEIGHT_OFFSET - DAMPED_TRANSLATE_LIMIT;
     } else {
-      return viewportHeight - drawerContentHeight;
+      return viewportHeight - drawerContentHeight + DAMPED_TRANSLATE_LIMIT;
     }
   }, [fullHeight, drawerContentHeight, viewportHeight]);
 
@@ -430,13 +423,26 @@ const Drawer = ({
 
       dragState.current.translateY = newTranslateY;
 
-      // Prevent drawer from being dragged too far up
+      // // Prevent drawer from being dragged too far up
       const amountDrawerShowing =
         window.innerHeight - dragState.current.translateY;
       const drawerHeight = drawerElement.getBoundingClientRect().height;
 
+      // // console.log(amountDrawerShowing, drawerHeight);
       if (amountDrawerShowing >= drawerHeight) {
         return;
+        // const adjustedValue = mapEased(
+        //   0,
+        //   window.innerHeight - drawerHeight,
+        //   0,
+        //   DAMPED_TRANSLATE_LIMIT,
+        //   Math.max(1, dragState.current.translateY)
+        // );
+
+        // dragState.current.translateY =
+        //   dragState.current.dragStartY -
+        //   adjustedValue -
+        //   dragState.current.initialYOffset;
       }
 
       drawerElement.style.transform = `translateY(${dragState.current.translateY}px)`;
@@ -562,11 +568,12 @@ const Drawer = ({
           maxHeight: viewportHeight,
           height:
             fullHeight === "100%"
-              ? `calc(100% - ${FULL_HEIGHT_OFFSET}px)`
+              ? `calc(100% + ${DAMPED_TRANSLATE_LIMIT}px)`
               : "auto",
           boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
           transition: "none",
           transform: `translateY(${viewportHeight}px)`,
+          paddingBottom: `${DAMPED_TRANSLATE_LIMIT}px`,
         }}
       >
         {header}
