@@ -7,24 +7,24 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-const map = (x1: number, x2: number, y1: number, y2: number, value: number) => {
-  return ((value - x1) * (y2 - y1)) / (x2 - x1) + y1;
-};
+// const map = (x1: number, x2: number, y1: number, y2: number, value: number) => {
+//   return ((value - x1) * (y2 - y1)) / (x2 - x1) + y1;
+// };
 
-const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+// const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
-const mapEased = (
-  x1: number,
-  x2: number,
-  y1: number,
-  y2: number,
-  value: number
-) => {
-  const clamped = Math.max(x1, Math.min(value, x2));
-  const t = (clamped - x1) / (x2 - x1);
-  const eased = easeOutCubic(1 - t);
-  return y1 + (y2 - y1) * eased;
-};
+// const mapEased = (
+//   x1: number,
+//   x2: number,
+//   y1: number,
+//   y2: number,
+//   value: number
+// ) => {
+//   const clamped = Math.max(x1, Math.min(value, x2));
+//   const t = (clamped - x1) / (x2 - x1);
+//   const eased = easeOutCubic(1 - t);
+//   return y1 + (y2 - y1) * eased;
+// };
 
 const useViewportHeight = () => {
   const [viewportHeight, setViewportHeight] = useState(0);

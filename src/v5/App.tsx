@@ -7,33 +7,6 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-function map(x1: number, x2: number, y1: number, y2: number, value: number) {
-  return ((value - x1) * (y2 - y1)) / (x2 - x1) + y1;
-}
-
-function mapWithEasing(
-  x1: number,
-  x2: number,
-  y1: number,
-  y2: number,
-  value: number,
-  [p1x, p1y, p2x, p2y]: [number, number, number, number] = [
-    0.17, 0.67, 0.1, 0.99,
-  ]
-) {
-  // Normalize input value to 0-1 range
-  const t = (value - x1) / (x2 - x1);
-
-  // Calculate bezier curve value using cubic bezier formula
-  const bezierT = (t: number) => {
-    const invT = 1 - t;
-    return 3 * invT * invT * t * p1y + 3 * invT * t * t * p2y + t * t * t;
-  };
-
-  // Map bezier output back to target range
-  return y1 + bezierT(t) * (y2 - y1);
-}
-
 const useViewportHeight = () => {
   const [viewportHeight, setViewportHeight] = useState(0);
 
